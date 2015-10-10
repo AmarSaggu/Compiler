@@ -1,3 +1,24 @@
+# vim temp files
 *.swp
+
+*.annot
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+
+# ocamlbuild working directory
+_build/
+
+# ocamlbuild targets
+*.byte
 *.native
-_build
+
+# oasis generated files
+setup.data
+setup.log
+>>>>>>> e72c71fa29205d8f7d0ff6ae1d2b1e860749b0e0
