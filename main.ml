@@ -45,7 +45,7 @@ let loop filename () =
     |> (fun x -> List.iter x (fun y -> print_endline (print_ast y)))
 
 let () =
-    Command.basic ~summary:"compile"
+    Command.basic ~summary:"Compile"
         Command.Spec.(empty +> anon ("filename" %: file))
         loop 
     |> Command.run
