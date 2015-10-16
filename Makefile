@@ -1,16 +1,18 @@
 COMPILER = ocamlbuild
 FLAGS = -use-menhir -use-ocamlfind -pkg core -tag thread
 
+SRC=src
+
 MAIN = main.native
 TEST = test.native
 
 all: clean_natives $(MAIN) $(TEST)
 
 $(MAIN): 
-	$(COMPILER) $(FLAGS) $@
+	$(COMPILER) $(FLAGS) $(SRC)/$@
 
 $(TEST):
-	$(COMPILER) $(FLAGS) $@
+	$(COMPILER) $(FLAGS) $(SRC)/$@
 
 clean: clean_natives
 	rm -rf _build/
