@@ -47,11 +47,11 @@ str = "Hello World!"
 
 Newline characters ignored, thus the following two programs are equivalent:
 ```
-let x = 2
-let y = 5
-let z = "hi"
+x = 2
+y = 5
+z = "hi"
 ```
 
 ```
-let x = 2 let y = 5 let z = "hi"
+x = 2 y = 5 z = "hi"
 ```
