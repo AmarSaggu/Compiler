@@ -11,9 +11,16 @@ make
 ```
 To parse a file into an AST, run:
 ```
-./test.native <filename>
+./main.native <filename>
 ```
 
+# Testing
+The file Test.ml contains some basic tests for the parser. To execute these tests, run:
+```
+./test.native
+```
+
+This will run each test then report the total results of all the tests.
 
 # The Language
 The language being created here will be based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
