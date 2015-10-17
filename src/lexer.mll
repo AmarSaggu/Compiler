@@ -19,12 +19,12 @@ rule read =
     | int       { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | string    { STRING (let s = Lexing.lexeme lexbuf in
                           Bytes.sub s 1 ((Bytes.length s) - 2)) }
-    | '+'       { PLUS }
-    | '-'       { MINUS }
-    | '*'       { TIMES }
-    | '/'       { DIVIDE }
-    | '('       { LEFT_BRACE }
-    | ')'       { RIGHT_BRACE }
+    | '+'       { ADD }
+    | '-'       { SUB }
+    | '*'       { MUL }
+    | '/'       { DIV }
+    | '('       { LBRACE }
+    | ')'       { RBRACE }
     | '='       { EQUALS }
     | _         { raise (LexicalError ("unexpected char '" ^
                                       Lexing.lexeme lexbuf ^
