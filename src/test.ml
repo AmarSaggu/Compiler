@@ -18,7 +18,7 @@ let tests = [
     (Fail, "str = \"hello \" + \"world\"");
     (Fail, "str = 2 * \"four\"");
     (Pass, "n = (a + 2) / (b - 1)");
-    (Fail, "n = -(2 + 2)");
+    (Pass, "n = -(2 + 2)");
     (Pass, "str\n=\n2\n+\n5\n\n");
 ];;
 

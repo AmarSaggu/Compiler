@@ -2,8 +2,8 @@
     open Syntax
 %}
 
-%token <int> INT
-%token <string> STRING VAR
+%token <int> NUMBER
+%token <string> IDENTIFIER STRING
 
 %token ADD SUB
 %token MUL DIV
@@ -13,8 +13,13 @@
 %token EQUALS
 %token EOF
 
+%token LAMBDA ARROW
+
+%right ARROW
+
 %left ADD SUB
 %left MUL DIV
+
 
 %start <Syntax.ast list> top
 
@@ -24,14 +29,19 @@ top:
     | vl = list(var); EOF  { vl }
 
 var:
-    | v = VAR; EQUALS; e = exp      { VarDecl (v, Int e) }
-    | v = VAR; EQUALS; s = STRING   { VarDecl (v, Str s) }
+    | v = IDENTIFIER; EQUALS; e = exp       { VarDecl (v, e) }
 
 exp:
-    | i = INT                   { IntExp i }
-    | v = VAR                   { VarExp v }
+    | f = func                  { f }
     | LBRACE; e = exp; RBRACE   { e }
-    | e = exp; ADD; f = exp     { Exp (Add, e, f) }
-    | e = exp; SUB; f = exp     { Exp (Sub, e, f) }
-    | e = exp; MUL; f = exp     { Exp (Mul, e, f) }
-    | e = exp; DIV; f = exp     { Exp (Div, e, f) }
+    | v = IDENTIFIER            { Variable v }
+    | i = NUMBER                { Integer i }
+    | s = STRING                { String s }
+    | SUB; e = exp              { Arithmetic (Sub, Integer 0, e) }
+    | e = exp; ADD; f = exp     { Arithmetic (Add, e, f) }
+    | e = exp; SUB; f = exp     { Arithmetic (Sub, e, f) }
+    | e = exp; MUL; f = exp     { Arithmetic (Mul, e, f) }
+    | e = exp; DIV; f = exp     { Arithmetic (Div, e, f) }
+
+func:
+    | LAMBDA; nl = list(IDENTIFIER); ARROW; e = exp     { Function (nl, e) }
