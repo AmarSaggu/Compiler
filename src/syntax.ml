@@ -14,6 +14,7 @@ type types =
     | Str of string
 
 type ast =
+    | Stuff of ast list
     | VarDecl of string * types
     | Var of string
 
