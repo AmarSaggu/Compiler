@@ -81,3 +81,14 @@ inc = fun x -> x + 1
 neg = fun x -> -x
 add = fun x y -> x + y
 ```
+
+# Optimisation
+The compiler currently implements constant folding in order to compute simple arithmetic. Mathematics involving 2 literal integers is computed at compile-time.
+
+Here's an example of it working on a simple arithmetic expression
+```
+    x = 2 * (3 + 4) - 7
+=>  x = 2 * 7 - 7
+=>  x = 14 - 7
+=>  x = 7
+```
