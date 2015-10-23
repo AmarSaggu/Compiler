@@ -4,6 +4,8 @@ A compiler for a small language being developed for the Compiler Construction mo
 # Building
 Make sure that you have OCaml and Menhir installed before attempting to build.
 
+It has been tested using OCaml 4.02.1 and Menhir 20150912.
+
 To build using the Makefile you can run:
 
 ```
@@ -25,7 +27,7 @@ This will run each test then report the total results of all the tests.
 # The Language
 The language being created here will be based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
 
-There are two types of variables in the language right now; integers and strings. There is no need to specify types as they are deduced by the compiler.
+Variables are a handy part of the language. They can store integers, booleans, strings and functions. There is no need to specify types as they are deduced by the compiler.
 
 A program just consists of a list of variable assignments. The following is be a valid program:
 ```
@@ -44,6 +46,11 @@ Strings can be declared, but currently there are no string operations:
 str = "Hello World!"
 ```
 
+Booleans are another type in the language. Like strings, there are no operations for handling booleans:
+```
+yes = true
+no = false
+```
 
 Newline characters ignored, thus the following two programs are equivalent:
 ```
@@ -54,4 +61,23 @@ z = "hi"
 
 ```
 x = 2 y = 5 z = "hi"
+```
+
+Anonymous functions are also a part of the language. They are declared as:
+```
+fun <args> -> <code>
+```
+
+Here are some examples:
+```
+fun x -> x + 1
+fun x -> -x
+fun x y -> x + y
+```
+
+Anonymous functions can also be assigned to variables:
+```
+inc = fun x -> x + 1
+neg = fun x -> -x
+add = fun x y -> x + y
 ```
