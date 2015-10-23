@@ -83,7 +83,8 @@ add = fun x y -> x + y
 ```
 
 # Optimisation
-The compiler currently implements constant folding in order to compute simple arithmetic. Mathematics involving 2 literal integers is computed at compile-time.
+The compiler currently implements constant folding in order to compute simple arithmetic.
+Mathematics involving literal integers is computed at compile-time.
 
 Here's an example of it working on a simple arithmetic expression
 ```
