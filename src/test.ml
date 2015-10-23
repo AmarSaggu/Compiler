@@ -1,33 +1,19 @@
 open Lexing
 open Lexer
 open Printf
+module In_channel = Core.Std.In_channel
 
 type result = Pass | Fail
 
-let tests = [
-    (Pass, "");
-    (Pass, "str = \"Hello World\"");
-    (Fail, "str = \"Goodbye World");
-    (Fail, "str");
-    (Pass, "n = 2 + 4");
-    (Pass, "n = 8 * 2 - 3 / 423");
-    (Pass, "n = -1 * -9 - -2 / -4");
-    (Fail, "n = 1 + ");
-    (Pass, "n = n + 1");
-    (Pass, "lsaklsjfsofaoiasfdisfho = gjafaskfdajfdsjllfasdks");
-    (Fail, "str = \"hello \" + \"world\"");
-    (Fail, "str = 2 * \"four\"");
-    (Pass, "n = (a + 2) / (b - 1)");
-    (Pass, "n = -(2 + 2)");
-    (Pass, "str\n=\n2\n+\n5\n\n");
-];;
-
-let print_result = function
+let result_to_string = function
     | Pass -> "Pass"
     | Fail -> "Fail"
 
+let get_filenames () = Sys.readdir "tests/pass"
+let get_file filename = In_channel.create filename
+
 let run prog = 
-    Lexing.from_string prog
+    Lexing.from_channel prog
     |> Parser.top Lexer.read
     |> (fun x -> ())
 
@@ -38,16 +24,30 @@ let test prog =
 
 let compare (expect, prog) = (expect, test prog)
 
-let print_result (expect, actual) = 
-    let expect' = print_result expect in
-    let actual' = print_result actual in
-    "    " ^ expect' ^ " | " ^ actual';;
+let print_result expect (filename, actual) = 
+    let expect' = result_to_string expect in
+    let actual' = result_to_string actual in
+    filename ^ ": expected to " ^ expect' ^ ", not " ^ actual';;
 
-printf "Running %d tests\n\n" (List.length tests);;
-print_endline "Expected   Actual"
+let run_tests dir =
+    let files = Array.to_list (Sys.readdir dir) in
+    List.map (Bytes.cat dir) files
+    |> List.map get_file
+    |> List.map test
+    |> List.combine files;;
 
-let results = List.map compare tests;;
-List.map print_endline (List.map print_result results);;
+let pass = run_tests "tests/pass/";;
+let fail = run_tests "tests/fail/";;
 
-let passed = List.filter (fun (a,b) -> a = b) results;;
-printf "\nPassed %d/%d tests\n" (List.length passed) (List.length tests)
+let pass' = List.filter (fun x -> (snd x) != Pass) pass;;
+let fail' = List.filter (fun x -> (snd x) != Fail) fail;;
+
+List.map (fun x -> print_endline (fst x)) pass';;
+
+if (List.length pass') + (List.length fail') = 0 then
+    print_endline "All tests passed"
+else begin
+    print_endline "Test(s) failed";
+    List.iter (fun x -> print_endline (print_result Pass x)) pass';
+    List.iter (fun x -> print_endline (print_result Fail x)) fail'
+end

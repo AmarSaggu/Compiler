@@ -35,7 +35,7 @@ var:
     | v = IDENTIFIER; EQUALS; e = exp2 { VarDecl (v, e) }
 
 exp2:
-    | i = IDENTIFIER; args = nonempty_list(exp) { Execution (i, args) }
+    | i = IDENTIFIER; args = nonempty_list(args) { Execution (i, args) }
     | e = exp { e }
 
 exp:
@@ -44,6 +44,7 @@ exp:
     | b = boolean               { Boolean b }
     | i = NUMBER                { Integer i }
     | s = STRING                { String s }
+    | SUB; e = exp              { Arithmetic (Sub, Integer 0, e) }
     | e = exp; o = op; f = exp  { Arithmetic (o, e, f) }
     | LBRACE; e = exp; RBRACE   { e }
 
