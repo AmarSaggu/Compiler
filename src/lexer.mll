@@ -15,8 +15,10 @@ rule read =
     parse
     | white     { read lexbuf }
     | newline   { Lexing.new_line lexbuf; read lexbuf }
-    | "->"      { ARROW }
     | "fun"     { LAMBDA }
+    | "->"      { ARROW }
+    | "true"    { TRUE }
+    | "false"   { FALSE }
     | '+'       { ADD }
     | '-'       { SUB }
     | '*'       { MUL }

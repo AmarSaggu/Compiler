@@ -6,6 +6,7 @@ type op =
 
 type expr =
     | Integer of int
+    | Boolean of bool
     | String of string
     | Function of (string list * expr)
     | Arithmetic of op * expr * expr
@@ -14,24 +15,25 @@ type expr =
 type ast =
     | VarDecl of string * expr
 
-let print_op = function
+let op_to_string = function
     | Add -> "+"
     | Sub -> "-"
     | Mul -> "*"
     | Div -> "/"
 
-let rec print_expr = function
+let rec expr_to_string = function
     | Integer i -> string_of_int i
+    | Boolean b -> string_of_bool b
     | String s -> "\"" ^ s ^ "\""
     | Function (vars, f) ->
         let vars' = Bytes.concat " " vars in
-        "(fun " ^ vars' ^ " -> " ^ (print_expr f) ^ ")"
+        "(fun " ^ vars' ^ " -> " ^ (expr_to_string f) ^ ")"
     | Arithmetic (op,e,f) ->
-        let e' = print_expr e in
-        let f' = print_expr f in
-        let op' = print_op op in
-        "("^e'^" "^op'^" "^f'^")"
+        let e' = expr_to_string e in
+        let f' = expr_to_string f in
+        let op' = op_to_string op in
+        "(" ^ e' ^ " " ^ op' ^ " " ^ f' ^ ")"
     | Variable v -> v
 
 let print_ast = function
-    | VarDecl (name, e) -> "var " ^ name ^ " = " ^ (print_expr e)
+    | VarDecl (name, e) -> name ^ " = " ^ (expr_to_string e)

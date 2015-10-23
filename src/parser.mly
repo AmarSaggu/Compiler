@@ -5,6 +5,8 @@
 %token <int> NUMBER
 %token <string> IDENTIFIER STRING
 
+%token TRUE FALSE
+
 %token ADD SUB
 %token MUL DIV
 
@@ -20,7 +22,6 @@
 %left ADD SUB
 %left MUL DIV
 
-
 %start <Syntax.ast list> top
 
 %%
@@ -34,14 +35,22 @@ var:
 exp:
     | f = func                  { f }
     | LBRACE; e = exp; RBRACE   { e }
+    | b = boolean               { Boolean b }
     | v = IDENTIFIER            { Variable v }
     | i = NUMBER                { Integer i }
     | s = STRING                { String s }
     | SUB; e = exp              { Arithmetic (Sub, Integer 0, e) }
-    | e = exp; ADD; f = exp     { Arithmetic (Add, e, f) }
-    | e = exp; SUB; f = exp     { Arithmetic (Sub, e, f) }
-    | e = exp; MUL; f = exp     { Arithmetic (Mul, e, f) }
-    | e = exp; DIV; f = exp     { Arithmetic (Div, e, f) }
+    | e = exp; o = op; f = exp  { Arithmetic (o, e, f) }
+
+%inline op:
+    | ADD   { Add }
+    | SUB   { Sub }
+    | MUL   { Mul }
+    | DIV   { Div }
+
+%inline boolean:
+    | TRUE  { true }
+    | FALSE { false }
 
 func:
-    | LAMBDA; nl = list(IDENTIFIER); ARROW; e = exp     { Function (nl, e) }
+    | LAMBDA; args = list(IDENTIFIER); ARROW; e = exp     { Function (args, e) }
