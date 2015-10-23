@@ -9,6 +9,7 @@ type expr =
     | Boolean of bool
     | String of string
     | Function of (string list * expr)
+    | Execution of (string * expr list)
     | Arithmetic of op * expr * expr
     | Variable of string
 
@@ -28,6 +29,9 @@ let rec expr_to_string = function
     | Function (vars, f) ->
         let vars' = Bytes.concat " " vars in
         "(fun " ^ vars' ^ " -> " ^ (expr_to_string f) ^ ")"
+    | Execution (var, args) ->
+        let args' = Bytes.concat " "(List.map expr_to_string args) in
+        var ^ " " ^ args'
     | Arithmetic (op,e,f) ->
         let e' = expr_to_string e in
         let f' = expr_to_string f in
