@@ -26,6 +26,7 @@ rule read =
     | '('       { LBRACE }
     | ')'       { RBRACE }
     | '='       { EQUALS }
+    | ';'       { SEMICOLON }
     | name      { IDENTIFIER (Lexing.lexeme lexbuf) }
     | number    { NUMBER (int_of_string (Lexing.lexeme lexbuf)) }
     | string    { STRING (let s = Lexing.lexeme lexbuf in

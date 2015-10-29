@@ -10,6 +10,8 @@
 %token ADD SUB
 %token MUL DIV
 
+%token SEMICOLON
+
 %token LBRACE RBRACE
 
 %token EQUALS
@@ -32,31 +34,28 @@ top:
     | vl = list(var); EOF { vl }
 
 var:
-    | v = IDENTIFIER; EQUALS; e = exp2 { VarDecl (v, e) }
-
-exp2:
-    | i = IDENTIFIER; args = nonempty_list(args) { Execution (i, args) }
-    | e = exp { e }
+    | v = IDENTIFIER; EQUALS; e = exp { VarDecl (v, e) }
+    | v = IDENTIFIER; EQUALS; e = yee { VarDecl (v, e) }
 
 exp:
-    | v = IDENTIFIER            { Variable v }
     | f = func                  { f }
-    | b = boolean               { Boolean b }
     | i = NUMBER                { Integer i }
     | s = STRING                { String s }
-    | SUB; e = exp              { Arithmetic (Sub, Integer 0, e) }
+    | LBRACE; SUB; e = exp; RBRACE              { Arithmetic (Sub, Integer 0, e) }
     | e = exp; o = op; f = exp  { Arithmetic (o, e, f) }
     | LBRACE; e = exp; RBRACE   { e }
+    | v = IDENTIFIER            { Variable v }
+    | i = IDENTIFIER; el = nonempty_list(exp) { Execution (i, el) }
 
-%inline func:
+yee:
+    | e = exp { e }
+
+func:
     | LAMBDA; args = nonempty_list(IDENTIFIER); ARROW; e = exp { Function (args, e) }
-
-%inline boolean:
-    | TRUE  { true }
-    | FALSE { false }
 
 %inline op:
     | ADD   { Add }
     | SUB   { Sub }
     | MUL   { Mul }
     | DIV   { Div }
+
