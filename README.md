@@ -1,5 +1,7 @@
-# Compiler
-A compiler for a small language being developed for the Compiler Construction module using OCamllex and Menhir.
+# Yip
+Yip is a small programming being developed for my Compiler Construction module.
+
+The Yip Comiler uses OCamllex and Menhir.
 
 # Building
 Make sure that you have OCaml and Menhir installed before attempting to build.
@@ -25,7 +27,7 @@ The file Test.ml contains some basic tests for the parser. To execute these test
 This will run each test then report the total results of all the tests.
 
 # The Language
-The language being created here will be based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
+Yip is mainly based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
 
 Variables are a handy part of the language. They can store integers, booleans, strings and functions. There is no need to specify types as they are deduced by the compiler.
 
