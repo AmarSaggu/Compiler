@@ -26,6 +26,11 @@ The file Test.ml contains some basic tests for the parser. To execute these test
 
 This will run each test then report the total results of all the tests.
 
+There is also an expression test, comparing the output of arithmetic in OCaml and Yip:
+```
+./runtime.sh
+```
+
 # The Language
 Yip is mainly based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
 
