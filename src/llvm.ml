@@ -1,15 +1,13 @@
 open Core.Std
 open Syntax
 
-(*let indent str = String.tr ~target:"\n" ~replacement:"\n\t"*)
-
 let indent str =
     "\t" ^
     (String.split str ~on:'\n'
     |> String.concat ~sep:"\n\t")
 
 let main_fun (ret, main) =
-    "define i32 @main()\n{\n" ^ (indent (main ^ "\nret i32 ")) ^ ret ^ "\n}"
+    "define i32 @main()\n{\n" ^ (indent (main ^ "\nret i32 ") ^ ret) ^ "\n}"
 
 let assign_reg =
     let reg = ref 0 in

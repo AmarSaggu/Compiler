@@ -17,17 +17,15 @@ rule read =
     | newline   { Lexing.new_line lexbuf; read lexbuf }
     | "fun"     { LAMBDA }
     | "->"      { ARROW }
-    | "true"    { TRUE }
-    | "false"   { FALSE }
     | '+'       { ADD }
     | '-'       { SUB }
     | '*'       { MUL }
     | '/'       { DIV }
+    | ','       { COMMA }
+    | '='       { EQUALS }
     | '('       { LBRACE }
     | ')'       { RBRACE }
-    | '='       { EQUALS }
-    | ';'       { SEMICOLON }
-    | name      { IDENTIFIER (Lexing.lexeme lexbuf) }
+    | name      { IDENT (Lexing.lexeme lexbuf) }
     | number    { NUMBER (int_of_string (Lexing.lexeme lexbuf)) }
     | string    { STRING (let s = Lexing.lexeme lexbuf in
                           Bytes.sub s 1 ((Bytes.length s) - 2)) }

@@ -3,16 +3,14 @@
 %}
 
 %token <int> NUMBER
-%token <string> IDENTIFIER STRING
-
-%token TRUE FALSE
+%token <string> IDENT STRING
 
 %token ADD SUB
 %token MUL DIV
 
-%token SEMICOLON
-
 %token LBRACE RBRACE
+
+%token COMMA
 
 %token EQUALS
 %token EOF
@@ -24,34 +22,28 @@
 %left ADD SUB
 %left MUL DIV
 
-%right IDENTIFIER
-
 %start <Syntax.ast list> top
 
 %%
 
 top:
-    | vl = list(var); EOF { vl }
+    | vl = list(var); EOF   { vl }
 
 var:
-    | v = IDENTIFIER; EQUALS; e = exp { VarDecl (v, e) }
-    | v = IDENTIFIER; EQUALS; e = yee { VarDecl (v, e) }
+    | v = IDENT; EQUALS; e = exp    { VarDecl (v, e) }
 
 exp:
-    | f = func                  { f }
-    | i = NUMBER                { Integer i }
-    | s = STRING                { String s }
-    | LBRACE; SUB; e = exp; RBRACE              { Arithmetic (Sub, Integer 0, e) }
-    | e = exp; o = op; f = exp  { Arithmetic (o, e, f) }
-    | LBRACE; e = exp; RBRACE   { e }
-    | v = IDENTIFIER            { Variable v }
-    | i = IDENTIFIER; el = nonempty_list(exp) { Execution (i, el) }
-
-yee:
-    | e = exp { e }
+    | i = NUMBER                    { Integer i }
+    | s = STRING                    { String s }
+    | v = IDENT                     { Variable v }
+    | SUB; e = exp                  { Arithmetic (Sub, Integer 0, e) }
+    | e = exp; o = op; f = exp      { Arithmetic (o, e, f) }
+    | LBRACE; e = exp; RBRACE       { e }
+    | f = func                      { f }
 
 func:
-    | LAMBDA; args = nonempty_list(IDENTIFIER); ARROW; e = exp { Function (args, e) }
+    | LAMBDA; args = nonempty_list(IDENT); ARROW; e = exp           { Function (args, e) }
+    | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE    { Execution (i, el) }
 
 %inline op:
     | ADD   { Add }
