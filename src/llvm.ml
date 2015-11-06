@@ -15,43 +15,31 @@ let assign_reg =
         incr reg;
         "%" ^ (string_of_int !reg)
 
-type asm =
-    | I of int
-    | A of asm * asm
-   
-let rec comp = function
-    | I i -> (string_of_int i, "")
-    | A (x, y) ->
-        let (cx, fx) = comp x in
-        let (cy, fy) = comp y in
-        let decl = assign_reg () in
-        let def = decl ^ " = add i32 " ^ cx ^ ", " ^ cy ^ "\n" in
-        (decl, fx ^ fy ^ def)
-
 let op_to_opcode = function
     | Add -> "add"
     | Sub -> "sub"
     | Mul -> "mul"
     | Div -> "sdiv"
 
-let rec syn = function
+let rec arith reg = function
     | Integer i -> (string_of_int i, "")
+    | Variable v -> ("%" ^ v, "")
     | Arithmetic (op, x, y) ->
-        let (xdecl, xdef) = syn x in
-        let (ydecl, ydef) = syn y in
-        let decl = assign_reg () in
-        let op' = op_to_opcode op in
-        let def = decl ^ " = " ^ op' ^ " i32 " ^ xdecl ^ ", " ^ ydecl ^ "\n" in
+        let (xdecl, xdef) = arith "" x in
+        let (ydecl, ydef) = arith "" y in
+        let op_str = op_to_opcode op in
+        let decl = if reg = "" then assign_reg () else "%" ^ reg in
+        let def = decl ^ " = " ^ op_str ^ " i32 " ^ xdecl ^ ", " ^ ydecl ^ "\n" in
         (decl, xdef ^ ydef ^ def)
-    | _ ->
-        let err = "error: operation not supported" in
-        (err, err)
+
+let eval reg = function
+    | Integer i ->
+        let decl = if reg = "" then assign_reg () else "%" ^ reg in
+        (decl, decl ^ " = add i32 " ^ string_of_int i ^ ", 0\n")
+    | Variable v ->
+        let decl = if reg = "" then assign_reg () else "%" ^ reg in
+        (decl, decl ^ " = add i32 %" ^ v ^ ", 0\n")
+    | Arithmetic (op, x, y) -> arith reg (Arithmetic (op, x, y))
 
 let syn_ast = function
-    | VarDecl (str, expr) -> syn expr
-
-        (*
-let code = A (A ((I 4), (I 8)), I 9)
-let res = comp code;;
-
-print_endline (main_fun (snd res) (fst res))*)
+    | VarDecl (str, expr) -> eval str expr

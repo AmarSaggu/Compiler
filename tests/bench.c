@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -16,7 +17,7 @@ char get_op()
 
 int main(void)
 {
-	srand(0);
+	srand(time(NULL));
 
 	printf("x = %d", get_num());
 	for (int i = 0; i < 10000 - 1; i++) {

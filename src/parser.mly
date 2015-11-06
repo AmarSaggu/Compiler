@@ -42,7 +42,7 @@ exp:
     | f = func                      { f }
 
 func:
-    | LAMBDA; args = nonempty_list(IDENT); ARROW; e = exp           { Function (args, e) }
+    | LAMBDA; args = list(IDENT); ARROW; e = exp           { Function (args, e) }
     | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE    { Execution (i, el) }
 
 %inline op:
