@@ -15,16 +15,26 @@ rule read =
     parse
     | white     { read lexbuf }
     | newline   { Lexing.new_line lexbuf; read lexbuf }
+    | "true"    { TRUE }
+    | "false"   { FALSE }
     | "fun"     { LAMBDA }
     | "->"      { ARROW }
+
+    | "=="      { EQUALITY }
+    | "!="      { INEQUALITY }
+
+    | '('       { LBRACE }
+    | ')'       { RBRACE }
+
+    | '{'       { LCURLY }
+    | '}'       { RCURLY }
+
     | '+'       { ADD }
     | '-'       { SUB }
     | '*'       { MUL }
     | '/'       { DIV }
     | ','       { COMMA }
-    | '='       { EQUALS }
-    | '('       { LBRACE }
-    | ')'       { RBRACE }
+    | '='       { ASSIGNMENT }
     | name      { IDENT (Lexing.lexeme lexbuf) }
     | number    { NUMBER (int_of_string (Lexing.lexeme lexbuf)) }
     | string    { STRING (let s = Lexing.lexeme lexbuf in

@@ -17,8 +17,9 @@ let tokenise filename () =
     |> List.map syn_ast
     |> List.map snd
     |> Bytes.concat ""
-    |> (fun a -> main_fun ("%x", a))
     |> print_endline
+    (*|> (fun a -> main_fun ("%x", a))*)
+    (*|> print_endline*)
     (*|> List.iter (fun y -> print_endline (main_fun (syn_ast y)))*)
 
 let () =
