@@ -8,4 +8,4 @@ addn = fun a b c d e f g h -> 7
 
 main = fun x -> print(x)
 
-higher = fun x -> print(fun y -> x + y)
+higher = fun x -> print(negate(y))

@@ -1,0 +1,8 @@
+fact = fun n -> {
+	if n then
+		n * fact(n - 1)
+	else
+		1
+}
+
+main = fun -> fib(6)

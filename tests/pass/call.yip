@@ -1,0 +1,3 @@
+add = fun x y -> x + y
+
+main = fun -> add(1, add(1, add(1, 1)))
