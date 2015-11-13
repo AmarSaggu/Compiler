@@ -4,7 +4,7 @@
 
 int get_num()
 {
-	return rand() % 10;
+	return (1 + rand() % 10);
 }
 
 char get_op()
@@ -25,9 +25,7 @@ int main(void)
 		
 		int a;
 
-		do {
 			a = get_num();
-		} while (op == '/' && a == 0);
 
 		printf(" %c %d", op, a);
 	}

@@ -18,6 +18,10 @@ rule read =
     | "fun"     { LAMBDA }
     | "->"      { ARROW }
 
+    | "if"      { IF }
+    | "then"    { THEN }
+    | "else"    { ELSE }
+
     | '('       { LBRACE }
     | ')'       { RBRACE }
 

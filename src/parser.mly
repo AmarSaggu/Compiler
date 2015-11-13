@@ -13,6 +13,8 @@
 
 %token LAMBDA ARROW
 
+%token IF THEN ELSE
+
 %token COMMA
 
 %token ASSIGNMENT
@@ -32,18 +34,13 @@
 top:
     | vl = list(exp); EOF   { vl }
 
-all:
-    | e = exp { e }
-
 exp:
     | m = math {m}
     | d = decl { d }
-    | LCURLY; el = list(exp); RCURLY    { EList el }
 
 %inline decl:
     | name = IDENT; ASSIGNMENT; e = exp                                     { Decl (name, e) }
-    | name = IDENT; ASSIGNMENT; LAMBDA; args = list(IDENT); ARROW; e = all  { Function (name, args, e) }
-    | i = IDENT; LBRACE; el = separated_list(COMMA, all); RBRACE            { Call (i, el) }
+    | name = IDENT; ASSIGNMENT; LAMBDA; args = list(IDENT); ARROW; e = exp  { Function (name, args, e) }
 
 math:
     | LBRACE; m = math; RBRACE      { m }
@@ -51,6 +48,10 @@ math:
     | i = NUMBER                    { Integer i }
     | SUB; m = math                 { Arithmetic (Sub, Integer 0, m) }
     | m = math; o = op; n = math    { Arithmetic (o, m, n) }
+    | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE            { Call (i, el) }
+    | LCURLY; el = list(exp); RCURLY    { EList el }
+
+    | IF; c = math; THEN; a = math; ELSE; b = math  { IfElse (c, a, b) }
 
 %inline op:
     | ADD   { Add }

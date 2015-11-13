@@ -14,12 +14,7 @@ let tokenise filename () =
     |> Errors.name_lexbuf filename
     |> Errors.parse file
     (*|> List.map Optimisation.cfold*)
-    
-    (*
-    |> List.map ast_to_str
-    |> List.iter print_endline 
-    *)
-    |> List.map (compile (create_reg_generator ()))
+    |> List.map (compile (create_reg_generator "%") (create_reg_generator ""))
     |> List.map fst
     |> Bytes.concat ""
     |> print_endline

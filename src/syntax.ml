@@ -16,7 +16,9 @@ type ast =
     
     | EList of ast list
 
-let op_str = function
+    | IfElse of ast * ast * ast
+
+let op_to_str = function
     | Add -> "+"
     | Sub -> "-"
     | Mul -> "*"
@@ -32,7 +34,7 @@ let rec ast_to_str = function
    
     | Integer i -> string_of_int i  
     | Arithmetic (op, e, f) ->
-        let op' = op_str op in
+        let op' = op_to_str op in
         let e' = ast_to_str e in
         let f' = ast_to_str f in
         "(" ^ e' ^ " " ^ op' ^ " " ^ f' ^ ")"
@@ -43,3 +45,9 @@ let rec ast_to_str = function
     | EList el ->
         let el' = Bytes.concat "\n" (List.map ast_to_str el) in
         "{\n" ^ el' ^ "\n}"
+
+    | IfElse (cond, a, b) ->
+        let cond' = ast_to_str cond in
+        let a' = ast_to_str a in
+        let b' = ast_to_str b in
+        "if " ^ cond' ^ " then " ^ a' ^ " else " ^ b'

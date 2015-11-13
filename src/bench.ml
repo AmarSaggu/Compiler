@@ -15,7 +15,7 @@ let extension = function
 
 let boilerplate filename x = function
     | Yip ->
-"x = " ^ x
+"main = fun -> " ^ x
     | C ->
 "int main() {
     int x = " ^ x ^ ";
