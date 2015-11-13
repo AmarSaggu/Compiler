@@ -4,27 +4,17 @@ type op =
     | Mul
     | Div
 
-type booleanop =
-    | Eq
-    | Neq
-    | Lt
-    | Gt
-    | Le
-    | Ge
-
-type expr =
+type ast =
+    | Function of string * string list * ast
+    | Call of string * ast list
+    
     | Integer of int
-    | Boolean of bool
-    | String of string
-    | Function of string * string list * expr
-    | Execution of string * expr list
-    | Arithmetic of op * expr * expr
-    | BooleanOp of booleanop * expr * expr
+    | Arithmetic of op * ast * ast
+    
+    | Decl of string * ast
     | Variable of string
+    
     | EList of ast list
-
-and ast =
-    | VarDecl of string * expr
 
 let op_str = function
     | Add -> "+"
@@ -32,38 +22,24 @@ let op_str = function
     | Mul -> "*"
     | Div -> "/"
 
-let booleanop_str = function
-    | Eq -> "=="
-    | Neq -> "!="
-    | Lt -> "<"
-    | Gt -> ">"
-    | Le -> "<="
-    | Ge -> ">="
-
-let rec expr_str = function
-    | Integer i -> string_of_int i
-    | Boolean b -> string_of_bool b
-    | String s -> "\"" ^ s ^ "\""
-    | Function (name, vars, f) ->
+let rec ast_to_str = function
+    | Function (name, vars, body) ->
         let vars' = Bytes.concat " " vars in
-        name ^ "(fun " ^ vars' ^ " -> " ^ (expr_str f) ^ ")"
-    | Execution (var, args) ->
-        let args' = Bytes.concat " "(List.map expr_str args) in
-        var ^ " " ^ args'
+        name ^ "(fun " ^ vars' ^ " -> " ^ (ast_to_str body) ^ ")"
+    | Call (func, args) ->
+        let args' = Bytes.concat " "(List.map ast_to_str args) in
+        func ^ "(" ^ args' ^ ")"
+   
+    | Integer i -> string_of_int i  
     | Arithmetic (op, e, f) ->
         let op' = op_str op in
-        let e' = expr_str e in
-        let f' = expr_str f in
+        let e' = ast_to_str e in
+        let f' = ast_to_str f in
         "(" ^ e' ^ " " ^ op' ^ " " ^ f' ^ ")"
-    | BooleanOp (op, e, f) ->
-        let op' = booleanop_str op in
-        let e' = expr_str e in
-        let f' = expr_str f in
-        "(" ^ e' ^ " " ^ op' ^ " "^ f' ^ ")"
+    
+    | Decl (name, value) -> name ^ " = " ^ (ast_to_str value)
     | Variable v -> v
+    
     | EList el ->
-        let el' = Bytes.concat "\n" (List.map ast_str el) in
+        let el' = Bytes.concat "\n" (List.map ast_to_str el) in
         "{\n" ^ el' ^ "\n}"
-
-and ast_str = function
-    | VarDecl (name, e) -> name ^ " = " ^ (expr_str e)

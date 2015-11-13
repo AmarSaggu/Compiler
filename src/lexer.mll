@@ -15,13 +15,8 @@ rule read =
     parse
     | white     { read lexbuf }
     | newline   { Lexing.new_line lexbuf; read lexbuf }
-    | "true"    { TRUE }
-    | "false"   { FALSE }
     | "fun"     { LAMBDA }
     | "->"      { ARROW }
-
-    | "=="      { EQUALITY }
-    | "!="      { INEQUALITY }
 
     | '('       { LBRACE }
     | ')'       { RBRACE }
@@ -37,8 +32,6 @@ rule read =
     | '='       { ASSIGNMENT }
     | name      { IDENT (Lexing.lexeme lexbuf) }
     | number    { NUMBER (int_of_string (Lexing.lexeme lexbuf)) }
-    | string    { STRING (let s = Lexing.lexeme lexbuf in
-                          Bytes.sub s 1 ((Bytes.length s) - 2)) }
     | _         { raise (LexicalError ("unexpected char '" ^
                                       Lexing.lexeme lexbuf ^
                                       "'")) }

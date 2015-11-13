@@ -3,8 +3,7 @@
 %}
 
 %token <int> NUMBER
-%token <bool> BOOLEAN
-%token <string> IDENT STRING
+%token <string> IDENT
 
 %token LBRACE RBRACE
 %token LCURLY RCURLY
@@ -17,10 +16,6 @@
 %token COMMA
 
 %token ASSIGNMENT
-
-%token EQUALITY INEQUALITY
-
-%token TRUE FALSE
 
 %token EOF
 
@@ -35,32 +30,27 @@
 %%
 
 top:
-    | vl = list(var); EOF   { vl }
+    | vl = list(exp); EOF   { vl }
 
-var:
-    | v = IDENT; ASSIGNMENT; LAMBDA; args = list(IDENT); ARROW; e = exp { VarDecl(v, Function (v, args, e)) }
-    | v = IDENT; ASSIGNMENT; e = exp    { VarDecl (v, e) }
+all:
+    | e = exp { e }
 
 exp:
-    | LBRACE; e = exp; RBRACE   { e }
-    
-    | b = BOOLEAN   { Boolean b }
-    | i = NUMBER    { Integer i }
-    | s = STRING    { String s }
-    | v = IDENT     { Variable v }
-    
-    | SUB; e = exp              { Arithmetic (Sub, Integer 0, e) }
-    | e = exp; o = op; f = exp  { Arithmetic (o, e, f) }
-    
-    | TRUE  { Integer 1 }
-    | FALSE { Integer 0 }
-    
-    | f = func                  { f }
+    | m = math {m}
+    | d = decl { d }
+    | LCURLY; el = list(exp); RCURLY    { EList el }
 
-    | LCURLY; el = list(var); RCURLY    { EList el }
+%inline decl:
+    | name = IDENT; ASSIGNMENT; e = exp                                     { Decl (name, e) }
+    | name = IDENT; ASSIGNMENT; LAMBDA; args = list(IDENT); ARROW; e = all  { Function (name, args, e) }
+    | i = IDENT; LBRACE; el = separated_list(COMMA, all); RBRACE            { Call (i, el) }
 
-func:
-    | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE    { Execution (i, el) }
+math:
+    | LBRACE; m = math; RBRACE      { m }
+    | v = IDENT                     { Variable v }
+    | i = NUMBER                    { Integer i }
+    | SUB; m = math                 { Arithmetic (Sub, Integer 0, m) }
+    | m = math; o = op; n = math    { Arithmetic (o, m, n) }
 
 %inline op:
     | ADD   { Add }

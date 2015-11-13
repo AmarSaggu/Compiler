@@ -14,14 +14,15 @@ let tokenise filename () =
     |> Errors.name_lexbuf filename
     |> Errors.parse file
     (*|> List.map Optimisation.cfold*)
-    |> List.map syn_ast
-    |> List.map snd
+    
+    (*
+    |> List.map ast_to_str
+    |> List.iter print_endline 
+    *)
+    |> List.map (compile (create_reg_generator ()))
+    |> List.map fst
     |> Bytes.concat ""
     |> print_endline
-    (*|> (fun a -> main_fun ("%x", a))*)
-    (*|> print_endline*)
-    (*|> List.iter (fun y -> print_endline (main_fun (syn_ast y)))*)
-
 let () =
     Command.basic ~summary:"Compile"
         Command.Spec.(empty +> anon ("filename" %: file))
