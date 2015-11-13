@@ -34,29 +34,12 @@ There is also an expression test, comparing the output of arithmetic in OCaml an
 # The Language
 Yip is mainly based on elements from Lua and Haskell, mixing Lua with some functional elements borrowed from Haskell.
 
-Variables are a handy part of the language. They can store integers, booleans, strings and functions. There is no need to specify types as they are deduced by the compiler.
-
-A program just consists of a list of variable assignments. The following is be a valid program:
-```
-a = 81
-b = "hi"
-```
+Variables are a handy part of the language. At the moment the types are functions and integers. There is no need to specify types as they are deduced by the compiler.
 
 Integers are the main data type right now. You can perform arithmetic with integers and variables:
 ```
 num = 9 * 2 + (18 - 5) / 3
 res = num / 3
-```
-
-Strings can be declared, but currently there are no string operations:
-```
-str = "Hello World!"
-```
-
-Booleans are another type in the language. Like strings, there are no operations for handling booleans:
-```
-yes = true
-no = false
 ```
 
 Newline characters ignored, thus the following two programs are equivalent:
@@ -88,6 +71,39 @@ inc = fun x -> x + 1
 neg = fun x -> -x
 add = fun x y -> x + y
 ```
+
+# The Main Function
+Every program starts off running the main function. The main function returns an exit code, which can be used to display a result.
+
+```
+main = fun -> 2 + 2
+```
+
+# Function Applicatoin
+
+You can apply a function using a C-like syntax:
+
+```
+add = fun x y -> x + y
+main = fun -> add(1, 2)
+```
+
+# Blocks
+
+Every function executes a single expression. This isn't very useful when you want to perform more complex operations.
+Blocks are used to perform multiple expressions.
+
+```
+main = fun -> {
+    a = 2 + 2
+    b = a * 4
+    c = a * b / 3
+    c - 18
+}
+```
+
+Each expression in the block is executed sequentially and the result from the final block is returned.
+
 
 # Optimisation
 The compiler currently implements constant folding in order to compute simple arithmetic.
