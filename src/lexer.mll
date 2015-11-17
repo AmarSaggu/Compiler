@@ -22,6 +22,16 @@ rule read =
     | "then"    { THEN }
     | "else"    { ELSE }
 
+    | "true"    { NUMBER 1 }
+    | "false"   { NUMBER 0 }
+
+    | "=="      { EQ }
+    | "!="      { NE }
+    | "<="      { LE }
+    | ">="      { GE }
+    | '<'       { LT }
+    | '>'       { GT }
+
     | '('       { LBRACE }
     | ')'       { RBRACE }
 
@@ -32,6 +42,7 @@ rule read =
     | '-'       { SUB }
     | '*'       { MUL }
     | '/'       { DIV }
+
     | ','       { COMMA }
     | '='       { ASSIGNMENT }
     | name      { IDENT (Lexing.lexeme lexbuf) }

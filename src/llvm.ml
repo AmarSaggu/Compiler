@@ -22,6 +22,15 @@ let create_reg_generator prefix =
         incr register;
         prefix ^ (string_of_int !register)
 
+let comp_to_instr = function
+    | Eq -> "eq"
+    | Ne -> "ne"
+
+    | Lt -> "slt"
+    | Gt -> "sgt"
+    | Le -> "sle"
+    | Ge -> "sge"
+
 let define_args args =
     let prefix = "i32 " in
     let args' =
@@ -40,8 +49,8 @@ let rec define_fun name args body =
     "\n" ^ header ^ "\n{\n" ^ (indent ((fst body) ^ "\n" ^ return)) ^ "\n}\n"
 
 and arithmetic gen label = function
-    | Integer i -> ("", string_of_int i)
-    | Arithmetic (op, x, y) ->
+    | Int i -> ("", string_of_int i)
+    | Arith (op, x, y) ->
         let (xdef, xname) = arithmetic gen label x in
         let (ydef, yname) = arithmetic gen label y in
         let op_str = op_to_opcode op in
@@ -51,14 +60,14 @@ and arithmetic gen label = function
     | a -> compile gen label a
 
 and compile gen label = function
-    | Integer i ->
+    | Int i ->
         let i_str = string_of_int i in
         let reg = gen () in
         (reg ^ " = add i32 " ^ i_str ^ ", 0\n", reg)
     | Decl (name, exp) ->
         let (def, reg) = compile gen label exp in
         (def ^ "%" ^ name ^ " = add i32 " ^ reg ^ ", 0\n", "%" ^ name)
-    | Variable v ->
+    | Var v ->
         ("", "%" ^ v)
 
     | Function (name, args, body) ->
@@ -83,9 +92,18 @@ and compile gen label = function
             List.map fst comp
             |> Bytes.concat "" in
         (def, name)
-    | Arithmetic (op, x, y) ->
-        arithmetic gen label (Arithmetic (op, x, y))
-    
+    | Arith (op, x, y) ->
+        arithmetic gen label (Arith (op, x, y))
+    | Comp (bop, x, y) ->
+        let (xdef, xname) = compile gen label x in
+        let (ydef, yname) = compile gen label y in
+        let reg = gen () in
+        let big = gen () in
+        let instr = comp_to_instr bop in
+        let comp = reg ^ " = icmp " ^ instr ^ " i32 " ^ xname ^ ", " ^ yname ^ "\n" in
+        let zext = big ^ " = zext i1 " ^ reg ^ "to i32\n" in
+        (xdef ^ ydef ^ comp ^ zext, big)
+
     | IfElse (cond, x, y) ->
         let labelid = label () in
         let (cdef, cname) = compile gen label cond in
@@ -108,9 +126,6 @@ and compile gen label = function
             phi in
         (finally, preg);
 
-
-
-
         (*
         let (cdef, cname) = compile gen cond in
         let (xdef, xname) = compile gen x in
@@ -124,4 +139,3 @@ and compile gen label = function
             compare ^ select in
         (finally, rreg);
         *)
-

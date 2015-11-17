@@ -11,6 +11,9 @@
 %token ADD SUB
 %token MUL DIV
 
+%token EQ NE
+%token LE GE LT GT
+
 %token LAMBDA ARROW
 
 %token IF THEN ELSE
@@ -35,8 +38,8 @@ top:
     | vl = list(exp); EOF   { vl }
 
 exp:
-    | m = math {m}
     | d = decl { d }
+    | m = math { m }
 
 %inline decl:
     | name = IDENT; ASSIGNMENT; e = exp                                     { Decl (name, e) }
@@ -44,10 +47,11 @@ exp:
 
 math:
     | LBRACE; m = math; RBRACE      { m }
-    | v = IDENT                     { Variable v }
-    | i = NUMBER                    { Integer i }
-    | SUB; m = math                 { Arithmetic (Sub, Integer 0, m) }
-    | m = math; o = op; n = math    { Arithmetic (o, m, n) }
+    | v = IDENT                     { Var v }
+    | i = NUMBER                    { Int i }
+    | SUB; m = math                 { Arith (Sub, Int 0, m) }
+    | m = math; o = op; n = math    { Arith (o, m, n) }
+    | m = math; b = bop; n = math   { Comp (b, m, n) }
     | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE            { Call (i, el) }
     | LCURLY; el = list(exp); RCURLY    { EList el }
 
@@ -58,3 +62,12 @@ math:
     | SUB   { Sub }
     | MUL   { Mul }
     | DIV   { Div }
+
+%inline bop:
+    | EQ    { Eq }
+    | NE    { Ne }
+
+    | LT    { Lt }
+    | GT    { Gt }
+    | LE    { Le }
+    | GE    { Ge }
