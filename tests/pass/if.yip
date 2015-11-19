@@ -1,0 +1,25 @@
+main = fun() -> {
+	a = if true then 1 else 2 end
+	b = if false then
+		2
+	else
+		4
+	end
+
+	c = if 258 then 1 else 5 end
+	d = if 0 then 1 else -1 end
+
+	e = if true then
+			if false then
+				1
+			else
+				2
+			end
+		else
+			if true then
+				3
+			else
+				4
+			end
+		end
+}

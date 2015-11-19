@@ -17,6 +17,7 @@ rule read =
     | newline   { Lexing.new_line lexbuf; read lexbuf }
     | "fun"     { LAMBDA }
     | "->"      { ARROW }
+    | "end"     { END }
 
     | "if"      { IF }
     | "then"    { THEN }

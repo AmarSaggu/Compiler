@@ -1,11 +1,11 @@
-identity = fun x -> x
-negate = fun x -> -x
+identity = fun(x) -> x
+negate = fun(x) -> -x
 
-addtwo = fun x y -> x + y
-addthreee = fun x y z -> x + y + z
+addtwo = fun(x, y) -> x + y
+addthreee = fun(x, y, z) -> x + y + z
 
-addn = fun a b c d e f g h -> 7
+addn = fun(a, b, c, d, e, f, g, h) -> 7
 
-main = fun x -> print(x)
+main = fun (x) -> print(x)
 
-higher = fun x -> print(negate(y))
+higher = fun   (x) -> print(negate(y))

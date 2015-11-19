@@ -1,0 +1,9 @@
+main = fun() -> {
+	a = true
+	b = false
+	
+	c = true + fales
+	d = true + 8 - false * 2
+
+	e = false / true
+}
