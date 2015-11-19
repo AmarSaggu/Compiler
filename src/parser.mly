@@ -25,7 +25,8 @@
 %token EOF
 
 
-%right ARROW
+%left EQ NE
+%left LE GE LT GT
 
 %left ADD SUB
 %left MUL DIV

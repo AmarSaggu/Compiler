@@ -1,5 +1,5 @@
 COMPILER = ocamlbuild
-FLAGS = -use-menhir -use-ocamlfind -pkg core -tag thread
+FLAGS = -use-menhir -use-ocamlfind -pkg core -tag thread -r
 
 SRC=src
 
