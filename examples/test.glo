@@ -1,4 +1,0 @@
-sum = 1 + 2 * 3 - 3 + 1
-var = 2 * sum + 1
-min = sum - var
-str = "hi there!"
