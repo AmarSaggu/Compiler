@@ -2,13 +2,9 @@ module String = Core.Std.String
 open Syntax
 
 let rec last = function
+    | [] -> failwith "empty list contains no elements"
     | [hd] -> hd
     | hd :: tl -> last tl
-
-let indent str = 
-    "\t" ^
-    (String.split str ~on:'\n'
-    |> Bytes.concat "\n\t")
 
 let op_to_opcode = function
     | Add -> "add"
@@ -44,9 +40,14 @@ let define_header name args =
 
 let rec define_fun name args body =
     let header = define_header name args in
-    let body = compile (create_reg_generator "%") (create_reg_generator "") body in
-    let return = "ret i32 " ^ (snd body) in
-    "\n" ^ header ^ "\n{\n" ^ (indent ((fst body) ^ "\n" ^ return)) ^ "\n}\n"
+    let return = "ret i32 " ^ (if name <> "main" then (snd body) else "0") in
+    let print = if name <> "main" then ""
+        else "call i32 (i8*, ...) @printf(i8 *getelementptr ([4 x i8], [4 x i8]* @_str, i64 0, i64 0), i32 " ^ (snd body) ^ ")\n" in
+    let print_str = if name <> "main" then ""
+        else "@_str = constant [4 x i8] c\"%d\\0A\\00\", align 1\n\n" in
+    let declare = if name <> "main" then ""
+        else "\ndeclare i32 @printf(i8*, ...)\n" in
+    "\n" ^ print_str ^ header ^ "\n{\n" ^ (indent ((fst body) ^ "\n" ^ print ^ return)) ^ "\n}\n" ^ declare
 
 and arithmetic gen label = function
     | Int i -> ("", string_of_int i)
@@ -54,7 +55,6 @@ and arithmetic gen label = function
         let (xdef, xname) = arithmetic gen label x in
         let (ydef, yname) = arithmetic gen label y in
         let op_str = op_to_opcode op in
-        let dep = "" in
         let reg = gen () in
         (xdef ^ ydef ^ reg ^ " = " ^ op_str ^ " i32 " ^ xname ^ ", " ^ yname ^ "\n", reg)
     | a -> compile gen label a
@@ -72,7 +72,14 @@ and compile gen label = function
 
     | Function (name, args, body) ->
         let args' = List.map ((^) "%") args in
-        (define_fun name args' body, "")
+        let body' =
+            let comp = List.map (compile (create_reg_generator "%") (create_reg_generator "")) body in
+            let name = snd (last comp) in
+            let def = 
+                List.map fst comp
+                |> Bytes.concat "" in
+            (def, name) in
+        (define_fun name args' body', "")
     | Call (name, el) ->
         let cargs = List.map (compile gen label) el in
         let def =
@@ -85,13 +92,6 @@ and compile gen label = function
         let call = " = call i32 " ^ "@" ^ name ^ args ^ "\n"in
         (def ^ reg ^ call, reg)
 
-    | EList el ->
-        let comp = List.map (compile gen label) el in
-        let name = snd (last comp) in
-        let def = 
-            List.map fst comp
-            |> Bytes.concat "" in
-        (def, name)
     | Arith (op, x, y) ->
         arithmetic gen label (Arith (op, x, y))
     | Comp (bop, x, y) ->
@@ -125,17 +125,3 @@ and compile gen label = function
             ydef ^ unconditional ^ endl ^ ":\n" ^
             phi in
         (finally, preg);
-
-        (*
-        let (cdef, cname) = compile gen cond in
-        let (xdef, xname) = compile gen x in
-        let (ydef, yname) = compile gen y in
-        let sreg = gen () in
-        let rreg = gen() in
-        let compare = sreg ^ " = icmp ne i32 " ^ cname ^ ", 0\n" in
-        let select = rreg ^ " = select i1 " ^ sreg ^ ", i32 " ^ xname ^ ", i32 " ^ yname ^ "\n" in
-        let finally =
-            cdef ^ xdef ^ ydef ^
-            compare ^ select in
-        (finally, rreg);
-        *)

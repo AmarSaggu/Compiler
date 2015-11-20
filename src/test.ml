@@ -39,15 +39,17 @@ let run_tests dir =
 let pass = run_tests "tests/pass/";;
 let fail = run_tests "tests/fail/";;
 
-let pass' = List.filter (fun x -> (snd x) != Pass) pass;;
-let fail' = List.filter (fun x -> (snd x) != Fail) fail;;
+let passed = List.filter (fun x -> (snd x) != Pass) pass;;
+let failed = List.filter (fun x -> (snd x) != Fail) fail;;
 
-List.map (fun x -> print_endline (fst x)) pass';;
+List.map (fun x -> print_endline (fst x)) passed;;
 
-if (List.length pass') + (List.length fail') = 0 then
+if (List.length passed) + (List.length failed) = 0 then
     print_endline "All tests passed"
 else begin
     print_endline "Test(s) failed";
-    List.iter (fun x -> print_endline (print_result Pass x)) pass';
-    List.iter (fun x -> print_endline (print_result Fail x)) fail'
-end
+    List.iter (fun x -> print_endline (print_result Pass x)) passed;
+    List.iter (fun x -> print_endline (print_result Fail x)) failed
+end;
+
+Test_optimisation.run ()

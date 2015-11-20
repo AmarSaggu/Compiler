@@ -16,7 +16,6 @@ rule read =
     | white     { read lexbuf }
     | newline   { Lexing.new_line lexbuf; read lexbuf }
     | "fun"     { LAMBDA }
-    | "->"      { ARROW }
     | "end"     { END }
 
     | "if"      { IF }
@@ -35,9 +34,6 @@ rule read =
 
     | '('       { LBRACE }
     | ')'       { RBRACE }
-
-    | '{'       { LCURLY }
-    | '}'       { RCURLY }
 
     | '+'       { ADD }
     | '-'       { SUB }

@@ -1,12 +1,13 @@
 %{
     open Syntax
+
+    let fun_gen = Llvm.create_reg_generator "_f"
 %}
 
 %token <int> NUMBER
 %token <string> IDENT
 
 %token LBRACE RBRACE
-%token LCURLY RCURLY
 
 %token ADD SUB
 %token MUL DIV
@@ -14,9 +15,9 @@
 %token EQ NE
 %token LE GE LT GT
 
-%token LAMBDA ARROW
+%token LAMBDA END
 
-%token IF THEN ELSE END
+%token IF THEN ELSE 
 
 %token COMMA
 
@@ -43,8 +44,8 @@ exp:
     | m = math { m }
 
 %inline decl:
-    | name = IDENT; ASSIGNMENT; e = exp                                     { Decl (name, e) }
-    | name = IDENT; ASSIGNMENT; LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; ARROW; e = exp   { Function (name, args, e) }
+    | name = IDENT; ASSIGNMENT; e = exp { Decl (name, e) }
+    | name = IDENT; ASSIGNMENT; LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END   { Function (name, args, body) }
 
 math:
     | LBRACE; m = math; RBRACE      { m }
@@ -52,11 +53,12 @@ math:
     | i = NUMBER                    { Int i }
     | SUB; m = math                 { Arith (Sub, Int 0, m) }
     | m = math; o = op; n = math    { Arith (o, m, n) }
-    | m = math; b = bop; n = math   { Comp (b, m, n) }
+    | m = math; c = cop; n = math   { Comp (c, m, n) }
     | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE            { Call (i, el) }
-    | LCURLY; el = list(exp); RCURLY    { EList el }
 
     | IF; c = math; THEN; a = math; ELSE; b = math; END  { IfElse (c, a, b) }
+
+    | LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END    { Function (fun_gen (), args, body) }
 
 %inline op:
     | ADD   { Add }
@@ -64,7 +66,7 @@ math:
     | MUL   { Mul }
     | DIV   { Div }
 
-%inline bop:
+%inline cop:
     | EQ    { Eq }
     | NE    { Ne }
 
