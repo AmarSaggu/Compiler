@@ -1,4 +1,4 @@
-main = fun() -> {
+main = fun()
 	a = true
 	b = false
 	
@@ -6,4 +6,4 @@ main = fun() -> {
 	d = true + 8 - false * 2
 
 	e = false / true
-}
+end

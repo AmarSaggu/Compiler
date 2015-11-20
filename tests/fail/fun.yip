@@ -1,1 +1,1 @@
-a = fun x -> 
+a = fun(x) 

@@ -1,9 +1,9 @@
-fact = fun(n) -> {
+fact = fun(n)
 	if n then
 		n * fact(n - 1)
 	else
 		1
 	end
-}
+end
 
-main = fun() -> fib(6)
+main = fun() fib(6) end

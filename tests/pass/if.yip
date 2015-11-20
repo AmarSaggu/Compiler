@@ -1,4 +1,4 @@
-main = fun() -> {
+main = fun()
 	a = if true then 1 else 2 end
 	b = if false then
 		2
@@ -22,4 +22,4 @@ main = fun() -> {
 				4
 			end
 		end
-}
+end
