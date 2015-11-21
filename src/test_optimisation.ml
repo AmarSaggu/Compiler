@@ -25,19 +25,18 @@ let ifprop = [
 ]
 
 let dprop = [
-    (Decl ("x", (Int 2)));
-    (Decl ("y", Arith (Add, (Var "x"), (Int 1))));
-];;
-
-(*List.iter print_endline (ast_to_str (chelper dprop))*)
-
-let x = cprop dprop in
-List.map ast_to_str x
-|> List.iter print_endline;;
+    (Function ("test", [], [
+        (Decl ("x", (Int 2)));
+        (Decl ("y", Arith (Add, (Var "x"), (Int 1))));
+    ]), Function ("test", [], [
+        (Decl ("y", Int 3))
+    ]))
+]
 
 let results =
-    List.map compare cfold @
-    List.map compare ifprop
+    (List.map compare cfold) @
+    (List.map compare ifprop) @
+    (List.map compare dprop)
 let failed = List.filter ((=) Fail) results
 
 let run () = 
