@@ -7,14 +7,15 @@ exception LexicalError of string
 
 let number = ['0'-'9']+
 let string = '"' [^'"']+ '"'
+let name = ['a'-'z' 'A'-'Z']+
 let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
-let name = ['a'-'z']+
 
 rule read =
     parse
     | white     { read lexbuf }
     | newline   { Lexing.new_line lexbuf; read lexbuf }
+
     | "fun"     { LAMBDA }
     | "end"     { END }
 
@@ -40,6 +41,8 @@ rule read =
     | '*'       { MUL }
     | '/'       { DIV }
 
+    | '#'       { comment lexbuf }
+
     | ','       { COMMA }
     | '='       { ASSIGNMENT }
     | name      { IDENT (Lexing.lexeme lexbuf) }
@@ -48,3 +51,9 @@ rule read =
                                       Lexing.lexeme lexbuf ^
                                       "'")) }
     | eof       { EOF }
+
+and comment =
+    parse
+    | newline   { Lexing.new_line lexbuf; read lexbuf }
+    | eof       { EOF }
+    | _         { comment lexbuf }
