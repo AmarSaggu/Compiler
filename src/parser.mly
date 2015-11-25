@@ -1,7 +1,7 @@
 %{
     open Syntax
 
-    let fun_gen = Llvm.create_reg_generator "_f"
+    let fun_gen = Codegen.create_reg_generator "_f"
 %}
 
 %token <int> NUMBER
