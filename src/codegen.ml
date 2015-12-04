@@ -17,6 +17,14 @@ let op_to_function = function
     | Mul -> build_mul
     | Div -> build_sdiv
 
+let comp_to_function = function
+    | Eq -> Icmp.Eq
+    | Ne -> Icmp.Ne
+    | Gt -> Icmp.Sgt
+    | Ge -> Icmp.Sge
+    | Lt -> Icmp.Slt
+    | Le -> Icmp.Sle
+
 let create_args scope args params =
     let params = Array.to_list params in
     let merge = List.combine args params in
@@ -44,7 +52,7 @@ let rec compile scope = function
         let block = append_block context "" fun_def in
         ignore (position_at_end block builder);
 
-        create_args fun_scope args (params fun_def);
+        ignore (create_args fun_scope args (params fun_def));
         
         let total = List.map (compile fun_scope) body in
         let ret_val = List.hd (List.rev total) in
@@ -64,3 +72,10 @@ let rec compile scope = function
         let a = compile scope a in
         let b = compile scope b in
         opfun a b "arith" builder
+    | Comp (comp, a, b) ->
+        let compfun = comp_to_function comp in
+        let a = compile scope a in
+        let b = compile scope b in
+        let res = build_icmp compfun a b "cmp" builder in
+        build_zext res integer_type "zext" builder
+
