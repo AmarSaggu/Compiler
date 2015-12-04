@@ -17,6 +17,14 @@ let op_to_function = function
     | Mul -> build_mul
     | Div -> build_sdiv
 
+let create_args scope args params =
+    let params = Array.to_list params in
+    let merge = List.combine args params in
+    List.map (fun (name, value) ->
+        let alloca = build_alloca integer_type name builder in
+        ignore (build_store value alloca builder);
+        Scope.add scope name alloca) merge
+
 let rec compile scope = function
 	| Decl (name, value) ->
         let value = compile scope value in
@@ -29,10 +37,15 @@ let rec compile scope = function
         build_load mem_loc name builder
     | Function (name, args, body) ->
         let fun_scope = Scope.create ~parent:global_scope () in
-        let fun_sig = function_type integer_type [||] in
+        let args_type = Array.make (List.length args) integer_type in
+        let fun_sig = function_type integer_type args_type in
+
         let fun_def = declare_function name fun_sig mdl in
         let block = append_block context "" fun_def in
         ignore (position_at_end block builder);
+
+        create_args fun_scope args (params fun_def);
+        
         let total = List.map (compile fun_scope) body in
         let ret_val = List.hd (List.rev total) in
         ignore (build_ret ret_val builder);
@@ -50,4 +63,4 @@ let rec compile scope = function
         let opfun = op_to_function op in
         let a = compile scope a in
         let b = compile scope b in
-        opfun a b "add" builder
+        opfun a b "arith" builder
