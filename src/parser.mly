@@ -1,7 +1,5 @@
 %{
     open Syntax
-
-    let fun_gen = Codegen.create_reg_generator "_f"
 %}
 
 %token <int> NUMBER
@@ -58,7 +56,7 @@ math:
 
     | IF; c = math; THEN; a = math; ELSE; b = math; END  { IfElse (c, a, b) }
 
-    | LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END    { Function (fun_gen (), args, body) }
+    | LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END    { Function ("yee", args, body) }
 
 %inline op:
     | ADD   { Add }

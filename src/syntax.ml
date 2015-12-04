@@ -1,10 +1,5 @@
 module String = Core.Std.String
 
-let indent str =
-    "\t" ^
-    (String.split str ~on:'\n'
-    |> Bytes.concat "\n\t")
-
 type op =
     | Add
     | Sub
@@ -32,6 +27,12 @@ type ast =
     | Var of string
 
     | IfElse of ast * ast * ast
+
+
+let indent str =
+    "\t" ^
+    (String.split str ~on:'\n'
+    |> Bytes.concat "\n\t")
 
 let op_to_str = function
     | Add -> "+"
