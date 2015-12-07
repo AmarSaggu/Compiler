@@ -78,4 +78,38 @@ let rec compile scope = function
         let b = compile scope b in
         let res = build_icmp compfun a b "cmp" builder in
         build_zext res integer_type "zext" builder
+    | IfElse (cond, a, b) ->
+        let zero = const_int integer_type 0 in
+        let cond = compile scope cond in
+        let cond = build_icmp Icmp.Ne cond zero "ifelse" builder in
 
+        let start_block = insertion_block builder in
+        let func = block_parent start_block in
+
+        let if_block = append_block context "if" func in
+        position_at_end if_block builder;
+        let a = compile scope a in
+        let end_if_block = insertion_block builder in
+
+        let else_block = append_block context "else" func in
+        position_at_end else_block builder;
+        let b = compile scope b in
+        let end_else_block = insertion_block builder in
+
+        let merge_block = append_block context "end" func in
+        position_at_end merge_block builder;
+
+        let join = [(a, end_if_block); (b, end_else_block)] in
+        let phi = build_phi join "" builder in
+        position_at_end start_block builder;
+
+        ignore (build_cond_br cond if_block else_block builder);
+
+        position_at_end end_if_block builder;
+        ignore (build_br merge_block builder);
+
+        position_at_end end_else_block builder;
+        ignore (build_br merge_block builder);
+
+        position_at_end merge_block builder;
+        phi

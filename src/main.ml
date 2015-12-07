@@ -12,8 +12,8 @@ open Lexer
 open Syntax
 open Optimisation
 
-let print_ast prog = 
-    List.map ast_to_str prog
+let print_ast ast = 
+    List.map ast_to_str ast
     |> Bytes.concat "\n"
     |> print_endline
 
