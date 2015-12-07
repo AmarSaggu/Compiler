@@ -54,8 +54,7 @@ let rec compile scope = function
 
         ignore (create_args fun_scope args (params fun_def));
         
-        let total = List.map (compile fun_scope) body in
-        let ret_val = List.hd (List.rev total) in
+        let ret_val = compile fun_scope body in
         ignore (build_ret ret_val builder);
         fun_def
     | Call (name, args) ->
@@ -113,3 +112,8 @@ let rec compile scope = function
 
         position_at_end merge_block builder;
         phi
+    | Block body ->
+        let block_scope = Scope.create ~parent:scope () in
+        let body = List.map (compile block_scope) body in
+        let ret_val = List.hd (List.rev body) in
+        ret_val

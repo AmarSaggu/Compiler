@@ -16,7 +16,7 @@ type cop =
     | Ge
 
 type ast =
-    | Function of string * string list * ast list
+    | Function of string * string list * ast
     | Call of string * ast list
     
     | Int of int
@@ -27,6 +27,8 @@ type ast =
     | Var of string
 
     | IfElse of ast * ast * ast
+    
+    | Block of ast list
 
 
 let indent str =
@@ -52,7 +54,7 @@ let cop_to_str = function
 let rec ast_to_str = function
     | Function (name, vars, body) ->
         let vars' = Bytes.concat " " vars in
-        let body' = Bytes.concat "\n" (List.map ast_to_str body) in
+        let body' = ast_to_str body in
         name ^ " = fun " ^ vars' ^ " ->\n" ^ (indent body') ^ "\nend\n"
     | Call (func, args) ->
         let args' = Bytes.concat " " (List.map ast_to_str args) in
@@ -78,3 +80,9 @@ let rec ast_to_str = function
         let a' = ast_to_str a in
         let b' = ast_to_str b in
         "if " ^ cond' ^ " then \n" ^ (indent a') ^ "\nelse\n" ^ (indent b') ^ "\nend\n"
+
+    | Block body ->
+        let body =
+            List.map ast_to_str body
+            |> Bytes.concat " " in
+        "{\n" ^ (indent body) ^ "\n}\n"

@@ -6,6 +6,7 @@
 %token <string> IDENT
 
 %token LBRACE RBRACE
+%token LCURLY RCURLY
 
 %token ADD SUB
 %token MUL DIV
@@ -13,7 +14,7 @@
 %token EQ NE
 %token LE GE LT GT
 
-%token LAMBDA END
+%token LAMBDA
 
 %token IF THEN ELSE 
 
@@ -30,20 +31,18 @@
 %left ADD SUB
 %left MUL DIV
 
+%right ELSE
+%right IDENT
+
 %start <Syntax.ast list> top
 
 %%
 
 top:
-    | vl = list(exp); EOF   { vl }
+    | vl = list(func); EOF   { vl }
 
-exp:
-    | d = decl { d }
-    | m = math { m }
-
-%inline decl:
-    | name = IDENT; ASSIGNMENT; e = exp { Decl (name, e) }
-    | name = IDENT; ASSIGNMENT; LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END   { Function (name, args, body) }
+func:
+    | LAMBDA; name = IDENT; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = math { Function (name, args, body) }
 
 math:
     | LBRACE; m = math; RBRACE      { m }
@@ -52,11 +51,11 @@ math:
     | SUB; m = math                 { Arith (Sub, Int 0, m) }
     | m = math; o = op; n = math    { Arith (o, m, n) }
     | m = math; c = cop; n = math   { Comp (c, m, n) }
-    | i = IDENT; LBRACE; el = separated_list(COMMA, exp); RBRACE            { Call (i, el) }
+    | i = IDENT; LBRACE; el = separated_list(COMMA, math); RBRACE            { Call (i, el) }
 
-    | IF; c = math; THEN; a = math; ELSE; b = math; END  { IfElse (c, a, b) }
-
-    | LAMBDA; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = exp+; END    { Function ("yee", args, body) }
+    | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
+    | name = IDENT; ASSIGNMENT; e = math { Decl (name, e) }
+    | LCURLY; b = nonempty_list(math); RCURLY   { Block b }
 
 %inline op:
     | ADD   { Add }
