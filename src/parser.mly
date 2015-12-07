@@ -16,7 +16,9 @@
 
 %token LAMBDA
 
-%token IF THEN ELSE 
+%token LET
+
+%token IF ELSE 
 
 %token COMMA
 
@@ -25,14 +27,13 @@
 %token EOF
 
 
+%right ELSE
+
 %left EQ NE
 %left LE GE LT GT
 
 %left ADD SUB
 %left MUL DIV
-
-%right ELSE
-%right IDENT
 
 %start <Syntax.ast list> top
 
@@ -48,14 +49,15 @@ math:
     | LBRACE; m = math; RBRACE      { m }
     | v = IDENT                     { Var v }
     | i = NUMBER                    { Int i }
-    | SUB; m = math                 { Arith (Sub, Int 0, m) }
     | m = math; o = op; n = math    { Arith (o, m, n) }
+    | SUB; m = math                 { Arith (Sub, Int 0, m) }
     | m = math; c = cop; n = math   { Comp (c, m, n) }
     | i = IDENT; LBRACE; el = separated_list(COMMA, math); RBRACE            { Call (i, el) }
 
-    | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
-    | name = IDENT; ASSIGNMENT; e = math { Decl (name, e) }
+    | LET; name = IDENT; ASSIGNMENT; e = math { Decl (name, e) }
+    | name = IDENT; ASSIGNMENT; e = math { Assign (name, e) }
     | LCURLY; b = nonempty_list(math); RCURLY   { Block b }
+    | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
 
 %inline op:
     | ADD   { Add }

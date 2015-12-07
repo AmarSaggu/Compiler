@@ -17,6 +17,8 @@ rule read =
     | newline   { Lexing.new_line lexbuf; read lexbuf }
 
     | "fun"     { LAMBDA }
+    
+    | "let"     { LET }
 
     | "if"      { IF }
     | "else"    { ELSE }

@@ -31,18 +31,28 @@ let create_args scope args params =
     List.map (fun (name, value) ->
         let alloca = build_alloca integer_type name builder in
         ignore (build_store value alloca builder);
-        Scope.add scope name alloca) merge
+        Scope.local_add scope name alloca) merge
 
 let rec compile scope = function
 	| Decl (name, value) ->
         let value = compile scope value in
         let alloca = build_alloca integer_type name builder in
         ignore (build_store value alloca builder);
-        Scope.add scope name alloca;
-        alloca
+        (* YOU SHOULD CHECK IF THE VARIABLE EXISTS IN THE CURRENT SCOPE *)
+        (match Scope.local_mem scope name with
+            | true -> raise (LogicalError "variable already declared in current scope")
+            | false -> ());
+        Scope.local_add scope name alloca;
+        value
+    | Assign (name, value) ->
+        let value = compile scope value in
+        let mem_loc = Scope.find scope name in
+        let store = build_store value mem_loc builder in
+        value 
     | Var name ->
         let mem_loc = Scope.find scope name in
         build_load mem_loc name builder
+    
     | Function (name, args, body) ->
         let fun_scope = Scope.create ~parent:global_scope () in
         let args_type = Array.make (List.length args) integer_type in

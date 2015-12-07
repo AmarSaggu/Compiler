@@ -24,6 +24,7 @@ type ast =
     | Comp of cop * ast * ast
     
     | Decl of string * ast
+    | Assign of string * ast 
     | Var of string
 
     | IfElse of ast * ast * ast
@@ -71,8 +72,8 @@ let rec ast_to_str = function
         let e' = ast_to_str e in
         let f' = ast_to_str f in
         "(" ^ e' ^ " " ^ cop' ^ " " ^ f' ^ ")"   
-
-    | Decl (name, value) -> name ^ " = " ^ (ast_to_str value)
+    | Decl (name, value) -> "let " ^ name ^ " = " ^ (ast_to_str value)
+    | Assign (name, value) -> name ^ " = " ^ (ast_to_str value)
     | Var v -> v
 
     | IfElse (cond, a, b) ->
