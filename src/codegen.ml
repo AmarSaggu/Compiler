@@ -9,7 +9,7 @@ let mdl = create_module context "yip"
 let builder = builder context
 let integer_type = integer_type context 64
 
-let global_scope = Scope.create ()
+let global_scope = Scope.create builder
 
 let op_to_function = function
     | Add -> build_add
@@ -53,8 +53,17 @@ let rec compile scope = function
         let mem_loc = Scope.find scope name in
         build_load mem_loc name builder
     
+    | External (name, args) ->
+        let fun_scope = Scope.create ~parent:global_scope builder in
+        let args_type = Array.make (List.length args) integer_type in
+        let fun_sig = function_type integer_type args_type in
+
+        let fun_def = declare_function name fun_sig mdl in
+        ignore (create_args fun_scope args (params fun_def));
+        fun_def
+
     | Function (name, args, body) ->
-        let fun_scope = Scope.create ~parent:global_scope () in
+        let fun_scope = Scope.create ~parent:global_scope builder in
         let args_type = Array.make (List.length args) integer_type in
         let fun_sig = function_type integer_type args_type in
 
@@ -123,7 +132,18 @@ let rec compile scope = function
         position_at_end merge_block builder;
         phi
     | Block body ->
-        let block_scope = Scope.create ~parent:scope () in
+        let start_block = insertion_block builder in
+        let parent_block = block_parent start_block in
+        let block_block = append_block context "yee" parent_block in
+        let block_scope = Scope.create ~parent:scope ~block:block_block builder in
+        ignore (build_br block_block builder);
+        ignore (position_at_end block_block builder);
         let body = List.map (compile block_scope) body in
         let ret_val = List.hd (List.rev body) in
         ret_val
+    | Repeat ->
+        match scope.block with
+            | None -> failwith "yee"
+            | Some b ->
+                ignore (build_br b builder);
+                const_int integer_type 0

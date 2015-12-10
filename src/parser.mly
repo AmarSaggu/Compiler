@@ -14,9 +14,11 @@
 %token EQ NE
 %token LE GE LT GT
 
-%token LAMBDA
+%token LAMBDA EXTERNAL
 
 %token LET
+
+%token REPEAT
 
 %token IF ELSE 
 
@@ -44,6 +46,7 @@ top:
 
 func:
     | LAMBDA; name = IDENT; LBRACE; args = separated_list(COMMA, IDENT); RBRACE; body = math { Function (name, args, body) }
+    | EXTERNAL; name = IDENT; LBRACE; args = separated_list(COMMA, IDENT); RBRACE { External (name, args) }
 
 math:
     | LBRACE; m = math; RBRACE      { m }
@@ -58,6 +61,7 @@ math:
     | name = IDENT; ASSIGNMENT; e = math { Assign (name, e) }
     | LCURLY; b = nonempty_list(math); RCURLY   { Block b }
     | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
+    | REPEAT { Repeat }
 
 %inline op:
     | ADD   { Add }

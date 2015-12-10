@@ -18,7 +18,11 @@ rule read =
 
     | "fun"     { LAMBDA }
     
+    | "extern"  { EXTERNAL }    
+    
     | "let"     { LET }
+
+    | "repeat"  { REPEAT }
 
     | "if"      { IF }
     | "else"    { ELSE }

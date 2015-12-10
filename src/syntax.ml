@@ -17,6 +17,7 @@ type cop =
 
 type ast =
     | Function of string * string list * ast
+    | External of string * string list
     | Call of string * ast list
     
     | Int of int
@@ -30,6 +31,7 @@ type ast =
     | IfElse of ast * ast * ast
     
     | Block of ast list
+    | Repeat
 
 
 let indent str =
@@ -87,3 +89,4 @@ let rec ast_to_str = function
             List.map ast_to_str body
             |> Bytes.concat " " in
         "{\n" ^ (indent body) ^ "\n}\n"
+    | Repeat -> "repeat\n"
