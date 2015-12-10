@@ -19,6 +19,7 @@
 %token LET
 
 %token REPEAT
+%token RETURN
 
 %token IF ELSE 
 
@@ -62,6 +63,7 @@ math:
     | LCURLY; b = nonempty_list(math); RCURLY   { Block b }
     | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
     | REPEAT { Repeat }
+    | RETURN; m = math { Return m }
 
 %inline op:
     | ADD   { Add }

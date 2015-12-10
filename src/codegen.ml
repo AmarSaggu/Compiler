@@ -97,6 +97,7 @@ let rec compile scope = function
         let res = build_icmp compfun a b "cmp" builder in
         build_zext res integer_type "zext" builder
     | IfElse (cond, a, b) ->
+        let alloca = build_alloca integer_type "ifelsevar" builder in
         let zero = const_int integer_type 0 in
         let cond = compile scope cond in
         let cond = build_icmp Icmp.Ne cond zero "ifelse" builder in
@@ -107,18 +108,18 @@ let rec compile scope = function
         let if_block = append_block context "if" func in
         position_at_end if_block builder;
         let a = compile scope a in
+        ignore (build_store a alloca builder);
         let end_if_block = insertion_block builder in
 
         let else_block = append_block context "else" func in
         position_at_end else_block builder;
         let b = compile scope b in
+        ignore (build_store b alloca builder);
         let end_else_block = insertion_block builder in
 
         let merge_block = append_block context "end" func in
         position_at_end merge_block builder;
 
-        let join = [(a, end_if_block); (b, end_else_block)] in
-        let phi = build_phi join "" builder in
         position_at_end start_block builder;
 
         ignore (build_cond_br cond if_block else_block builder);
@@ -130,20 +131,39 @@ let rec compile scope = function
         ignore (build_br merge_block builder);
 
         position_at_end merge_block builder;
-        phi
+        build_load alloca "ld" builder
     | Block body ->
         let start_block = insertion_block builder in
         let parent_block = block_parent start_block in
-        let block_block = append_block context "yee" parent_block in
-        let block_scope = Scope.create ~parent:scope ~block:block_block builder in
-        ignore (build_br block_block builder);
-        ignore (position_at_end block_block builder);
+        let body_block = append_block context "block" parent_block in
+        ignore (build_br body_block builder);
+        ignore (position_at_end body_block builder);
+
+        let block_scope =
+            Scope.create
+                ~parent:scope
+                ~body_block:body_block
+                builder in
+        
+        (*ignore (build_br body_block builder);*)
         let body = List.map (compile block_scope) body in
+        
         let ret_val = List.hd (List.rev body) in
         ret_val
     | Repeat ->
-        match scope.block with
-            | None -> failwith "yee"
+        (match scope.body_block with
+            | None -> raise (LogicalError "statement not in a block")
             | Some b ->
                 ignore (build_br b builder);
-                const_int integer_type 0
+                const_int integer_type 0)
+    | Return value ->
+        let value = compile scope value in
+        let mem_loc = match scope.end_res with
+            | None -> raise (LogicalError "statement not in a block")
+            | Some b -> b in
+        (match scope.end_block with
+            | None -> raise (LogicalError "statement not in a block")
+            | Some b ->
+                ignore (build_store value mem_loc builder);
+                ignore (build_br b builder);
+                value)

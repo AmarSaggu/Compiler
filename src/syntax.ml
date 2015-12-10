@@ -32,6 +32,7 @@ type ast =
     
     | Block of ast list
     | Repeat
+    | Return of ast
 
 
 let indent str =
@@ -90,3 +91,6 @@ let rec ast_to_str = function
             |> Bytes.concat " " in
         "{\n" ^ (indent body) ^ "\n}\n"
     | Repeat -> "repeat\n"
+    | Return r ->
+        let r' = ast_to_str r in
+        "ret " ^ r'

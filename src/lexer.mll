@@ -23,6 +23,7 @@ rule read =
     | "let"     { LET }
 
     | "repeat"  { REPEAT }
+    | "ret"     { RETURN }
 
     | "if"      { IF }
     | "else"    { ELSE }
