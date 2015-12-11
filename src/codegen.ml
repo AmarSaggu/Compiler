@@ -17,6 +17,7 @@ let op_to_function = function
     | Sub -> build_sub
     | Mul -> build_mul
     | Div -> build_sdiv
+    | Rem -> build_srem
 
 let comp_to_function = function
     | Eq -> Icmp.Eq

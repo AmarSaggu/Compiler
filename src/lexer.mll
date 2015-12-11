@@ -51,6 +51,7 @@ rule read =
     | '-'       { SUB }
     | '*'       { MUL }
     | '/'       { DIV }
+    | '%'       { REM }
 
     | '#'       { comment lexbuf }
 

@@ -23,7 +23,7 @@
 %token LCURLY RCURLY
 
 %token ADD SUB
-%token MUL DIV
+%token MUL DIV REM
 
 %token EQ NE
 %token LE GE LT GT
@@ -51,7 +51,7 @@
 %left LE GE LT GT
 
 %left ADD SUB
-%left MUL DIV
+%left MUL DIV REM
 
 %start <Syntax.ast list> top
 
@@ -88,6 +88,7 @@ math:
     | SUB   { Sub }
     | MUL   { Mul }
     | DIV   { Div }
+    | REM   { Rem }
 
 %inline cop:
     | EQ    { Eq }

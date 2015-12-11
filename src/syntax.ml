@@ -5,6 +5,7 @@ type op =
     | Sub
     | Mul
     | Div
+    | Rem
 
 type cop =
     | Eq
@@ -45,6 +46,7 @@ let op_to_str = function
     | Sub -> "-"
     | Mul -> "*"
     | Div -> "/"
+    | Rem -> "%"
 
 let cop_to_str = function
     | Eq -> "=="
