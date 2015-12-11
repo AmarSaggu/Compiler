@@ -150,9 +150,9 @@ let rec compile scope = function
         let body = List.map (compile block_scope) body in
        
         let ret_val = List.hd (List.rev body) in
+        ignore (build_store ret_val alloca builder);
         ignore (build_br end_block builder);
         ignore (position_at_end end_block builder);
-        ignore (build_store ret_val alloca builder);
         
         build_load alloca "body-res" builder
     | Repeat ->
@@ -166,9 +166,9 @@ let rec compile scope = function
         let mem_loc = match scope.end_res with
             | None -> raise (LogicalError "statement not in a block")
             | Some b -> b in
-        let addr = match scope.end_block with
+        let end_loc = match scope.end_block with
             | None -> raise (LogicalError "statement not in a block")
             | Some b -> b in
         ignore (build_store value mem_loc builder);
-        ignore (build_br addr builder);
+        ignore (build_br end_loc builder);
         value
