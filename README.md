@@ -38,31 +38,43 @@ Variables are a handy part of the language. At the moment the types are function
 
 Integers are the main data type right now. You can perform arithmetic with integers and variables:
 ```
-num = 9 * 2 + (18 - 5) / 3
-res = num / 3
+9 * 2 + (18 - 5) / 3
+num / 3
 ```
+
+Variables can be declared in the language:
+```
+let x = 2
+let y = 3 + 2
+let z = x - y
+```
+
 
 Newline characters ignored, thus the following two programs are equivalent:
 ```
-x = 2
-y = 5
-z = "hi"
+let x = 2
+let y = 5
 ```
 
 ```
-x = 2 y = 5 z = "hi"
+let x = 2 let y = 5 let z = "hi"
 ```
 
-Anonymous functions are also a part of the language. They are declared as:
+Functions are also a part of the language. They are declared as:
 ```
-fun <args> -> <code>
+fun <name>(<args>) <code>
 ```
 
 Here are some examples:
 ```
-fun x -> x + 1
-fun x -> -x
-fun x y -> x + y
+fun increment(x)
+    x + 1
+
+fun negate(x)
+    -x
+    
+fun add(x, y)
+    x + y
 ```
 
 Anonymous functions can also be assigned to variables:
@@ -76,7 +88,8 @@ add = fun x y -> x + y
 Every program starts off running the main function. The main function returns an exit code, which can be used to display a result.
 
 ```
-main = fun -> 2 + 2
+fun main()
+    2 + 2
 ```
 
 # Function Applicatoin
@@ -84,8 +97,11 @@ main = fun -> 2 + 2
 You can apply a function using a C-like syntax:
 
 ```
-add = fun x y -> x + y
-main = fun -> add(1, 2)
+fun add(x, y)
+    x + y
+    
+fun main()
+    add(1, 2)
 ```
 
 # Blocks
@@ -94,11 +110,11 @@ Every function executes a single expression. This isn't very useful when you wan
 Blocks are used to perform multiple expressions.
 
 ```
-main = fun -> {
-    a = 2 + 2
-    b = a * 4
-    c = a * b / 3
-    c - 18
+fun main() {
+    let a = 2 + 2
+    let b = a * 4
+    let c = a * b / 3
+    let c - 18
 }
 ```
 
@@ -111,8 +127,31 @@ Mathematics involving literal integers is computed at compile-time.
 
 Here's an example of it working on a simple arithmetic expression
 ```
-    x = 2 * (3 + 4) - 7
-=>  x = 2 * 7 - 7
-=>  x = 14 - 7
-=>  x = 7
+    let x = 2 * (3 + 4) - 7
+=>  let x = 2 * 7 - 7
+=>  let x = 14 - 7
+=>  let x = 7
+```
+
+# Control Flow
+
+Yip features if-else statements that evaluate to expressions.
+
+```
+let x =
+    if 1
+        0
+    else
+        1
+```
+
+# Loops
+
+The repeat keyword can be used to create an infinite loop:
+
+```
+let x = {
+    repeat
+}
+
 ```
