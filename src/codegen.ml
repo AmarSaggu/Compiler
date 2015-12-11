@@ -133,23 +133,32 @@ let rec compile scope = function
         position_at_end merge_block builder;
         build_load alloca "ld" builder
     | Block body ->
-        let start_block = insertion_block builder in
-        let parent_block = block_parent start_block in
+        let parent_block = block_parent (insertion_block builder) in
+        let alloca = build_alloca integer_type "res" builder in
+
         let body_block = append_block context "block" parent_block in
         ignore (build_br body_block builder);
-        ignore (position_at_end body_block builder);
 
+        let end_block = insertion_block builder in
+        let ended = append_block context "end" parent_block in
+        
         let block_scope =
             Scope.create
                 ~parent:scope
                 ~body_block:body_block
+                ~end_block:ended
+                ~end_res:alloca
                 builder in
         
-        (*ignore (build_br body_block builder);*)
+        ignore (position_at_end body_block builder);
         let body = List.map (compile block_scope) body in
-        
+       
         let ret_val = List.hd (List.rev body) in
-        ret_val
+        ignore (build_br ended builder);
+        ignore (position_at_end ended builder);
+        ignore (build_store ret_val alloca builder);
+        (*ret_val*)
+        build_load alloca "bres" builder
     | Repeat ->
         (match scope.body_block with
             | None -> raise (LogicalError "statement not in a block")
