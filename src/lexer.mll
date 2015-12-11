@@ -25,6 +25,9 @@ rule read =
     | "repeat"  { REPEAT }
     | "ret"     { RETURN }
 
+    | "while"   { WHILE }
+    | "for"     { FOR }
+
     | "if"      { IF }
     | "else"    { ELSE }
 

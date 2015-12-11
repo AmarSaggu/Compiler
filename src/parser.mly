@@ -1,5 +1,19 @@
 %{
     open Syntax
+
+    let while_to_ast cond body =
+        let cond_name = "_cond_" in
+        Block [
+            Decl (cond_name, cond);
+            IfElse (Var cond_name, Block [body], Int 0);
+            IfElse (Var cond_name, Repeat, Int 0);
+        ]
+    
+    let for_to_ast a b c body =
+        Block [
+            a;
+            while_to_ast b (Block [body; c]);
+        ]
 %}
 
 %token <int> NUMBER
@@ -18,8 +32,9 @@
 
 %token LET
 
-%token REPEAT
-%token RETURN
+%token REPEAT RETURN
+
+%token WHILE FOR
 
 %token IF ELSE 
 
@@ -64,6 +79,9 @@ math:
     | IF; c = math; a = math; ELSE; b = math { IfElse (c, a, b) }
     | REPEAT { Repeat }
     | RETURN; m = math { Return m }
+
+    | WHILE; cond = math; body = math   { while_to_ast cond body }
+    | FOR; a = math; COMMA; b = math; COMMA; c = math; body = math { for_to_ast a b c body }
 
 %inline op:
     | ADD   { Add }
